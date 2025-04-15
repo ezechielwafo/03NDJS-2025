@@ -1,25 +1,29 @@
 // importation du site
-import fetch from "node-fetch";
 import  *  as  cheerio  from  'cheerio' ;
 import fs from 'fs/promises';
-const newsTable = []
 async function fetchData(url) {
-    const response = await fetch(url)
-    const data = await response.text()
-    getTableau(data)
-    //console.log(data)
+    const response = await cheerio.fromURL('https://www.actualitix.com/capitales-du-monde-pays.html')
+    const data = response.extract({
+        publications: [
+          {
+            // Sélectionner toutes les lignes du corps du tableau
+            selector: 'tbody tr',
+            value: {
+              // Extraire le nom de la publication
+              name: 'td:nth-child(1)',
+              // Extraire les notes de la publication
+              capital: {
+                selector: 'td:nth-child(2)',
+                value: 'innerHTML',
+              },
+              continent: {
+                selector: 'td:nth-child(3)',
+                value: 'innerHTML',
+              },
+            },
+          },
+        ],
+      });
+    await fs.writeFile("dataTableau.json", JSON.stringify(data, null, 2))
 }
-fetchData('https://or.fr/cours/or#annual_performances')
-//extration du contenu
- async function getTableau(html){
-    const $ = cheerio.load(html)
-    $(".table-responsive", html).each(function(){
-        const newTable = {
-            id : newsTable.length + 1,
-            titre : $("thead").children("tr").children("th").text().trim,
-            attributs : $("tbody").children("tr").children("td").text().trim
-        }
-        newsTable.push(newTable)
-        })
-       await fs.writeFile("dataTableau.json", JSON.stringify(newsTable))
-} 
+fetchData()

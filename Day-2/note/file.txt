@@ -1,0 +1,2 @@
+pour ce jours nous devons extraire les element d'un tableau sur une page donner 
+ en se servent de scheerio pour en creer une base de donnees
