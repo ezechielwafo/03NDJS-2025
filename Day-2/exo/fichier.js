@@ -1,17 +1,15 @@
-
-
-
-
 // importation du site
+import fetch from "node-fetch";
 import  *  as  cheerio  from  'cheerio' ;
 import fs from 'fs/promises';
 const newsTable = []
-async function getData(url) {
-    const response = await cheerio.fromURL("https://or.fr/cours/or#annual_performances") 
-    const data = response.text()
+async function fetchData(url) {
+    const response = await fetch(url)
+    const data = await response.text()
     getTableau(data)
+    //console.log(data)
 }
-getData('https://or.fr/cours/or#annual_performances')
+fetchData('https://or.fr/cours/or#annual_performances')
 //extration du contenu
  async function getTableau(html){
     const $ = cheerio.load(html)
@@ -22,8 +20,6 @@ getData('https://or.fr/cours/or#annual_performances')
             attributs : $("tbody").children("tr").children("td").text().trim
         }
         newsTable.push(newTable)
-        console.log(newsTable)
-
         })
        await fs.writeFile("dataTableau.json", JSON.stringify(newsTable))
 } 
